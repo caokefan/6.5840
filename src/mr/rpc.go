@@ -8,6 +8,8 @@ package mr
 
 import "os"
 import "strconv"
+import "time"
+import "fmt"
 
 //
 // example to show how to declare the arguments
@@ -23,6 +25,49 @@ type ExampleReply struct {
 }
 
 // Add your RPC definitions here.
+const (
+	MAP   	= "MAP"
+	REDUCE 	= "REDUCE"
+	DONE	= "DONE"
+)
+
+type Task struct {
+	Id				int
+	Type			string
+	MapInputFile	string
+	WorkerId		int
+	DeadLine		time.Time
+}
+
+type ApplyForTaskArgs struct {
+	WorkerId		int
+	LastTaskId		int
+	LastTaskType	string
+}
+
+type ApplyForTaskReply struct {
+	TaskId			int
+	TaskType		string
+	MapInputFile	string
+	NREDUCE			int
+	NMap			int
+}
+
+func tmpMapOutFile(workerId, mapId, reduceId int) string {
+	return fmt.Sprintf("tmp-worker-%d-%d-%d", workerId, mapId, reduceId)
+}
+
+func finalMapOutFile(mapId, reduceId int) string {
+	return fmt.Sprintf("mr-%d-%d", mapId, reduceId)
+}
+
+func tmpReduceOutFile(workerId, reduceId int) string {
+	return fmt.Sprintf("tmp-worker-%d-out-%d", workerId, reduceId)
+}
+
+func finalReduceOutFile(reduceId int) string {
+	return fmt.Sprintf("mr-out-%d", reduceId)
+}
 
 
 // Cook up a unique-ish UNIX-domain socket name
